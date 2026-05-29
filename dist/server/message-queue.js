@@ -4,15 +4,16 @@ export class MessageQueue {
         this.resolvers = [];
         this.closed = false;
     }
-    push(message) {
+    push(content) {
         if (this.closed)
             return;
+        const msg = { type: "user", message: { role: "user", content } };
         if (this.resolvers.length > 0) {
             const resolve = this.resolvers.shift();
-            resolve({ value: message, done: false });
+            resolve({ value: msg, done: false });
         }
         else {
-            this.messages.push(message);
+            this.messages.push(msg);
         }
     }
     close() {

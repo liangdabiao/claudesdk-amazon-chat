@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "amazon-chat",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-22",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "containers": [
+    {
+      "class_name": "ChatSandbox",
+      "image": "../Dockerfile",
+      "instance_type": "basic"
+    }
+  ],
+
+  "durable_objects": {
+    "bindings": [
+      { "class_name": "ChatSandbox", "name": "ChatSandbox" },
+      { "class_name": "ChatProxy", "name": "ChatProxy" }
+    ]
+  },
+
+  "migrations": [
+    { "new_sqlite_classes": ["ChatSandbox", "ChatProxy"], "tag": "v1" }
+  ],
+
+  "assets": {
+    "directory": "../dist"
+  }
+}

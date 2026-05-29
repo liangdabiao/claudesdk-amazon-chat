@@ -9,7 +9,8 @@
     "dev:client": "vite",
     "build": "vite build && tsc -p tsconfig.server.json",
     "start": "node dist/server/index.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:cloudflare": "vite build && cd cloudflare && npm install"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.1.11",

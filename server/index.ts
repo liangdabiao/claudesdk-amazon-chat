@@ -145,7 +145,7 @@ function scanReports(): any[] {
 // --- Express ---
 const app = express();
 app.use(express.json());
-const distPath = path.join(__dirname, "..", "dist");
+const distPath = path.join(__dirname, "..");
 app.use(express.static(distPath));
 app.use("/reports", express.static(REPORTS_DIR));
 app.use("/review-analysis-reports", express.static(REVIEW_REPORTS_DIR));
@@ -224,6 +224,16 @@ wss.on("connection", (ws: ClientWS) => {
   });
 });
 
+
+// Cleanup empty sessions every 5 minutes
+setInterval(() => {
+  for (const [id, session] of sessions) {
+    if (session.subscribers.size === 0 && !session.listening) {
+      session.agent.close();
+      sessions.delete(id);
+    }
+  }
+}, 5 * 60 * 1000);
 setInterval(() => {
   wss.clients.forEach((ws) => {
     const c = ws as ClientWS;

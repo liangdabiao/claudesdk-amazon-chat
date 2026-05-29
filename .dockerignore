@@ -1,0 +1,9 @@
+node_modules
+dist
+reports
+review-analysis-reports
+uploads
+*.log
+.git
+.claude/settings.local.json
+cloudflare

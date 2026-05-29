@@ -1,7 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { ChatMessage, WSMessage } from "../types";
 
+const uuid = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const WS_URL = `${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/ws`;
+
+function getChatId(): string {
+  let id = sessionStorage.getItem("amazon_chat_id");
+  if (!id) {
+    id = uuid();
+    sessionStorage.setItem("amazon_chat_id", id);
+  }
+  return id;
+}
 
 export function useWebSocket() {
   const wsRef = useRef<WebSocket | null>(null);
@@ -23,7 +33,7 @@ export function useWebSocket() {
     ws.onopen = () => {
       if (!mountedRef.current) { ws.close(); return; }
       setIsConnected(true);
-      ws.send(JSON.stringify({ type: "subscribe", chatId: "default" }));
+      ws.send(JSON.stringify({ type: "subscribe", chatId: getChatId() }));
     };
 
     ws.onclose = () => {
@@ -44,7 +54,7 @@ export function useWebSocket() {
           setMessages((prev) => [
             ...prev,
             {
-              id: crypto.randomUUID(),
+              id: uuid(),
               role: "assistant",
               content: data.content || "",
               timestamp: Date.now(),
@@ -56,7 +66,7 @@ export function useWebSocket() {
           setMessages((prev) => [
             ...prev,
             {
-              id: crypto.randomUUID(),
+              id: uuid(),
               role: "system",
               content: "",
               toolCall: {
@@ -91,7 +101,7 @@ export function useWebSocket() {
           setMessages((prev) => [
             ...prev,
             {
-              id: crypto.randomUUID(),
+              id: uuid(),
               role: "system",
               content: `错误: ${data.error || "未知错误"}`,
               timestamp: Date.now(),
@@ -128,7 +138,7 @@ export function useWebSocket() {
     setMessages((prev) => [
       ...prev,
       {
-        id: crypto.randomUUID(),
+        id: uuid(),
         role: "user",
         content: content + (files?.length ? `\n📎 ${files.map((f) => f.name).join(", ")}` : ""),
         timestamp: Date.now(),
@@ -138,7 +148,7 @@ export function useWebSocket() {
 
     setIsThinking(true);
     wsRef.current.send(
-      JSON.stringify({ type: "chat", chatId: "default", content: content + fileNote })
+      JSON.stringify({ type: "chat", chatId: getChatId(), content: content + fileNote })
     );
   }, []);
 
